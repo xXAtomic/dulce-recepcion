@@ -45,16 +45,13 @@
 
     <div id="product-modal" class="fixed inset-0 bg-black bg-opacity-60 hidden z-50 flex justify-center items-center p-4 backdrop-blur-sm transition-opacity duration-300">
         <div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col md:flex-row relative">
-        <button onclick="closeProductModal()" title="Cerrar" aria-label="Cerrar" class="absolute top-4 right-4 text-gray-500 hover:text-red-500 z-10 text-2xl bg-white rounded-full w-8 h-8 flex items-center justify-center shadow">
-            <i class="fas fa-times" aria-hidden="true"></i>
-            <span class="sr-only">Cerrar</span>
-        </button>
-        
-        <div class="w-full md:w-1/2 bg-gray-100 p-4 flex flex-col justify-center">
-            <img id="modal-main-img" src="" alt="Imagen del producto" title="Imagen del producto" class="w-full h-64 md:h-80 object-contain rounded-lg shadow-sm mb-4 bg-white">
-            <div id="modal-thumbnails" class="flex gap-2 overflow-x-auto py-2 px-1 justify-center">
-                </div>
-        </div>
+            <button onclick="closeProductModal()" class="absolute top-4 right-4 text-gray-500 hover:text-red-500 z-10 text-2xl bg-white rounded-full w-8 h-8 flex items-center justify-center shadow"><i class="fas fa-times"></i></button>
+            
+            <div class="w-full md:w-1/2 bg-gray-100 p-4 flex flex-col justify-center">
+                <img id="modal-main-img" src="" class="w-full h-64 md:h-80 object-contain rounded-lg shadow-sm mb-4 bg-white">
+                <div id="modal-thumbnails" class="flex gap-2 overflow-x-auto py-2 px-1 justify-center">
+                    </div>
+            </div>
 
             <div class="w-full md:w-1/2 p-6 md:p-8 overflow-y-auto modal-scroll bg-white flex flex-col justify-between">
                 <div>
@@ -93,22 +90,15 @@
 
     <footer class="bg-gray-800 text-white text-center py-8 mt-10">
         <p class="text-lg font-bold font-sans">Dulce Recepción 🍪</p>
-        <p class="text-sm text-gray-400 mt-2">Hecho con ❤️ en Chile</p>
+        <p class="text-sm text-gray-400 mt-2">Hecho con ❤️ en Quilpue</p>
         <div class="mt-4 space-x-4">
-            <a href="https://www.instagram.com/tu_usuario/" class="text-gray-400 hover:text-white transition" title="Instagram — Dulce Recepción" aria-label="Instagram (abre en nueva ventana)">
-                <i class="fab fa-instagram text-2xl" aria-hidden="true"></i>
-                <span class="sr-only">Instagram</span>
-            </a>
-            <a href="https://wa.me/56930656989" class="text-gray-400 hover:text-white transition" title="Whatsapp — Dulce Recepción" aria-label="Whatsapp (abre en nueva ventana)">
-                <i class="fab fa-whatsapp text-2xl" aria-hidden="true"></i>
-                <span class="sr-only">Whatsapp</span>
-            </a>
+            <a href="#" class="text-gray-400 hover:text-white transition"><i class="fab fa-instagram text-2xl"></i></a>
+            <a href="#" class="text-gray-400 hover:text-white transition"><i class="fab fa-facebook text-2xl"></i></a>
         </div>
     </footer>
 
     <script>
         // --- CONFIGURACIÓN DE PRODUCTOS ---
-        // Para agregar más fotos, solo agrégalas a la lista 'images' separadas por coma.
         const products = [
             {
                 id: 1,
@@ -171,7 +161,9 @@
             }
         ];
 
-        let cart = [];
+        // Cambiamos 'cart' a un Map o un objeto para guardar cantidades
+        // Ejemplo: { productId: { productData, quantity } }
+        let cart = new Map(); // Usaremos Map para almacenar los ítems únicos y sus cantidades
 
         // --- RENDERIZADO DE PRODUCTOS ---
         const productList = document.getElementById('product-list');
@@ -179,7 +171,6 @@
             const card = document.createElement('div');
             card.className = "bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-2xl transition duration-300 border border-orange-50 group flex flex-col h-full";
             
-            // Usamos la primera imagen para la tarjeta
             const mainImage = prod.images[0];
 
             card.innerHTML = `
@@ -203,21 +194,29 @@
             productList.appendChild(card);
         });
 
-        // --- LÓGICA DEL CARRITO ---
+        // --- LÓGICA DEL CARRITO (MODIFICADA) ---
         function addToCart(id) {
             const product = products.find(p => p.id === id);
-            cart.push(product);
+            if (!product) return;
+
+            if (cart.has(id)) {
+                cart.get(id).quantity++;
+            } else {
+                cart.set(id, { product: product, quantity: 1 });
+            }
             renderCart();
             animateCartIcon();
-            
-            // Feedback visual simple
-            // Si se agrega desde el modal, podríamos cerrar el modal o mostrar mensaje.
-            // Aquí solo cerramos el modal si estaba abierto para mostrar el carrito luego si se desea, 
-            // o simplemente dejamos que siga comprando.
         }
 
-        function removeFromCart(index) {
-            cart.splice(index, 1);
+        function updateCartQuantity(id, change) {
+            if (!cart.has(id)) return;
+
+            const item = cart.get(id);
+            item.quantity += change;
+
+            if (item.quantity <= 0) {
+                cart.delete(id);
+            }
             renderCart();
         }
 
@@ -226,14 +225,18 @@
             const cartCount = document.getElementById('cart-count');
             const cartTotal = document.getElementById('cart-total');
 
-            cartCount.innerText = cart.length;
-            if(cart.length > 0) {
+            // Calcular el número total de ítems (no de productos únicos)
+            let totalItemsInCart = 0;
+            cart.forEach(item => totalItemsInCart += item.quantity);
+            cartCount.innerText = totalItemsInCart;
+            
+            if(totalItemsInCart > 0) {
                 cartCount.classList.remove('scale-0');
             } else {
                 cartCount.classList.add('scale-0');
             }
 
-            if (cart.length === 0) {
+            if (cart.size === 0) { // Si no hay productos únicos en el carrito
                 cartItemsContainer.innerHTML = `
                     <div class="flex flex-col items-center justify-center h-full text-gray-400">
                         <i class="fas fa-cookie-bite text-4xl mb-2"></i>
@@ -246,19 +249,24 @@
             let total = 0;
             cartItemsContainer.innerHTML = '';
 
-            cart.forEach((item, index) => {
-                total += item.price;
+            cart.forEach((item) => {
+                total += item.product.price * item.quantity;
                 const itemEl = document.createElement('div');
                 itemEl.className = "flex justify-between items-center mb-3 bg-white p-3 rounded-lg shadow-sm border border-gray-100";
                 itemEl.innerHTML = `
-                    <div class="flex items-center gap-3">
-                        <img src="${item.images[0]}" class="w-10 h-10 rounded object-cover">
-                        <div>
-                            <h4 class="font-bold text-xs md:text-sm text-gray-700 line-clamp-1">${item.name}</h4>
-                            <span class="text-orange-600 font-bold text-sm">$${item.price.toLocaleString('es-CL')}</span>
+                    <div class="flex items-center gap-3 w-3/4">
+                        <img src="${item.product.images[0]}" class="w-10 h-10 rounded object-cover">
+                        <div class="flex-grow">
+                            <h4 class="font-bold text-xs md:text-sm text-gray-700 line-clamp-1">${item.product.name}</h4>
+                            <span class="text-orange-600 font-bold text-sm">$${(item.product.price * item.quantity).toLocaleString('es-CL')}</span>
+                            <span class="text-gray-500 text-xs ml-2">(${item.product.price.toLocaleString('es-CL')} c/u)</span>
                         </div>
                     </div>
-                    <button onclick="removeFromCart(${index})" class="text-red-400 hover:text-red-600 w-8 h-8 flex items-center justify-center rounded-full hover:bg-red-50 transition"><i class="fas fa-trash"></i></button>
+                    <div class="flex items-center gap-2">
+                        <button onclick="updateCartQuantity(${item.product.id}, -1)" class="text-gray-600 hover:text-red-500 text-lg w-7 h-7 flex items-center justify-center rounded-full hover:bg-gray-100 transition">-</button>
+                        <span class="font-bold text-sm">${item.quantity}</span>
+                        <button onclick="updateCartQuantity(${item.product.id}, 1)" class="text-gray-600 hover:text-green-500 text-lg w-7 h-7 flex items-center justify-center rounded-full hover:bg-gray-100 transition">+</button>
+                    </div>
                 `;
                 cartItemsContainer.appendChild(itemEl);
             });
@@ -282,27 +290,24 @@
             const product = products.find(p => p.id === id);
             if (!product) return;
 
-            // Llenar datos
             document.getElementById('modal-title').innerText = product.name;
             document.getElementById('modal-price').innerText = `$${product.price.toLocaleString('es-CL')}`;
             document.getElementById('modal-desc').innerText = product.desc;
             
-            // Configurar botón de agregar
             const btn = document.getElementById('modal-add-btn');
             btn.onclick = () => {
                 addToCart(product.id);
                 closeProductModal();
-                toggleCart(); // Abrir carrito automáticamente al agregar desde el modal
+                toggleCart(); 
             };
 
-            // Galería de imágenes
             const mainImg = document.getElementById('modal-main-img');
             const thumbnails = document.getElementById('modal-thumbnails');
             
             mainImg.src = product.images[0];
             thumbnails.innerHTML = '';
 
-            if (product.images.length > 1) {
+            if (product.images.length > 0) { // Siempre debe haber al menos una imagen
                 product.images.forEach((imgSrc) => {
                     const thumb = document.createElement('img');
                     thumb.src = imgSrc;
@@ -314,7 +319,6 @@
                 });
             }
 
-            // Mostrar modal
             document.getElementById('product-modal').classList.remove('hidden');
         }
 
@@ -322,14 +326,13 @@
             document.getElementById('product-modal').classList.add('hidden');
         }
 
-        // Cerrar modal si se hace clic fuera
         document.getElementById('product-modal').addEventListener('click', function(e) {
             if (e.target === this) closeProductModal();
         });
 
-        // --- LÓGICA WHATSAPP ---
+        // --- LÓGICA WHATSAPP (MODIFICADA) ---
         function checkoutWhatsApp() {
-            if (cart.length === 0) {
+            if (cart.size === 0) { // Si no hay productos únicos
                 alert("Agrega productos al carrito primero 🍪");
                 return;
             }
@@ -338,20 +341,12 @@
             let message = "Hola Dulce Recepción! 🎄 Me gustaría hacer el siguiente pedido:%0A%0A";
             
             let total = 0;
-            const summary = {};
-            cart.forEach(item => {
-                total += item.price;
-                if (summary[item.name]) {
-                    summary[item.name].count++;
-                    summary[item.name].subtotal += item.price;
-                } else {
-                    summary[item.name] = { count: 1, subtotal: item.price };
-                }
+            
+            // Iteramos sobre el Map del carrito para construir el mensaje
+            cart.forEach((item) => {
+                total += item.product.price * item.quantity;
+                message += `▪️ ${item.quantity}x ${item.product.name} ($${(item.product.price * item.quantity).toLocaleString('es-CL')})%0A`;
             });
-
-            for (const [name, details] of Object.entries(summary)) {
-                message += `▪️ ${details.count}x ${name} ($${details.subtotal.toLocaleString('es-CL')})%0A`;
-            }
 
             message += `%0A*💰 Total a pagar: $${total.toLocaleString('es-CL')}*`;
             message += "%0A%0AQuedo atento a los datos de transferencia y coordinación de entrega.";
@@ -359,6 +354,9 @@
             const url = `https://wa.me/${phoneNumber}?text=${message}`;
             window.open(url, '_blank');
         }
+
+        // Inicializar el carrito al cargar
+        document.addEventListener('DOMContentLoaded', renderCart);
     </script>
 </body>
 </html>
