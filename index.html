@@ -45,10 +45,13 @@
 
     <div id="product-modal" class="fixed inset-0 bg-black bg-opacity-60 hidden z-50 flex justify-center items-center p-4 backdrop-blur-sm transition-opacity duration-300">
         <div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col md:flex-row relative">
-            <button onclick="closeProductModal()" class="absolute top-4 right-4 text-gray-500 hover:text-red-500 z-10 text-2xl bg-white rounded-full w-8 h-8 flex items-center justify-center shadow"><i class="fas fa-times"></i></button>
+            <button onclick="closeProductModal()" title="Cerrar" aria-label="Cerrar" class="absolute top-4 right-4 text-gray-500 hover:text-red-500 z-10 text-2xl bg-white rounded-full w-8 h-8 flex items-center justify-center shadow">
+                <i class="fas fa-times" aria-hidden="true"></i>
+                <span class="sr-only">Cerrar</span>
+            </button>
             
             <div class="w-full md:w-1/2 bg-gray-100 p-4 flex flex-col justify-center">
-                <img id="modal-main-img" src="" class="w-full h-64 md:h-80 object-contain rounded-lg shadow-sm mb-4 bg-white">
+                <img id="modal-main-img" src="" alt="" class="w-full h-64 md:h-80 object-contain rounded-lg shadow-sm mb-4 bg-white">
                 <div id="modal-thumbnails" class="flex gap-2 overflow-x-auto py-2 px-1 justify-center">
                     </div>
             </div>
@@ -92,8 +95,14 @@
         <p class="text-lg font-bold font-sans">Dulce Recepción 🍪</p>
         <p class="text-sm text-gray-400 mt-2">Hecho con ❤️ en Quilpue</p>
         <div class="mt-4 space-x-4">
-            <a href="#" class="text-gray-400 hover:text-white transition"><i class="fab fa-instagram text-2xl"></i></a>
-            <a href="#" class="text-gray-400 hover:text-white transition"><i class="fab fa-facebook text-2xl"></i></a>
+            <a href="#" class="text-gray-400 hover:text-white transition" title="Instagram" aria-label="Instagram">
+                <i class="fab fa-instagram text-2xl" aria-hidden="true"></i>
+                <span class="sr-only">Instagram</span>
+            </a>
+            <a href="#" class="text-gray-400 hover:text-white transition" title="Facebook" aria-label="Facebook">
+                <i class="fab fa-facebook text-2xl" aria-hidden="true"></i>
+                <span class="sr-only">Facebook</span>
+            </a>
         </div>
     </footer>
 
@@ -106,8 +115,8 @@
                 desc: "Un paquetito alegre con 4 galletas de jengibre decoradas a mano. Cada una trae un guiño festivo: botitas rojas, bastones dulces, coronas brillantes y arbolitos que parecen contar historias. Un detalle perfecto para endulzar la tarde o regalar un abrazo comestible.",
                 price: 2000,
                 images: [
-                    "fotos/galletas 4 unidades 001.jpg", // Foto principal
-                    "fotos/galletas 4 unidades 002.jpg"  // Foto detalle
+                    "https://github.com/xXAtomic/dulce-recepcion/blob/main/fotos/galletas%204%20unidades%20001.jpg", // Foto principal
+                    "https://github.com/xXAtomic/dulce-recepcion/blob/main/fotos/galletas%204%20unidades%20002.jpg"  // Foto detalle
                 ]
             },
             {
@@ -305,15 +314,18 @@
             const thumbnails = document.getElementById('modal-thumbnails');
             
             mainImg.src = product.images[0];
+            mainImg.alt = product.name;
             thumbnails.innerHTML = '';
 
             if (product.images.length > 0) { // Siempre debe haber al menos una imagen
-                product.images.forEach((imgSrc) => {
+                product.images.forEach((imgSrc, idx) => {
                     const thumb = document.createElement('img');
                     thumb.src = imgSrc;
+                    thumb.alt = product.name + " - imagen " + (idx + 1);
                     thumb.className = "w-16 h-16 object-cover rounded border-2 border-transparent hover:border-orange-500 cursor-pointer transition";
                     thumb.onclick = () => {
                         mainImg.src = imgSrc;
+                        mainImg.alt = product.name + " - imagen " + (idx + 1);
                     };
                     thumbnails.appendChild(thumb);
                 });
