@@ -9,128 +9,193 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Quicksand:wght@300;500;700&display=swap');
         body { font-family: 'Quicksand', sans-serif; }
-        h1, h2 { font-family: 'Pacifico', cursive; }
+        h1, h2, h3 { font-family: 'Pacifico', cursive; }
         .btn-wsp { background-color: #25D366; }
         .btn-wsp:hover { background-color: #128C7E; }
+        
+        /* Estilo para el scrollbar del modal */
+        .modal-scroll::-webkit-scrollbar { width: 8px; }
+        .modal-scroll::-webkit-scrollbar-track { background: #f1f1f1; }
+        .modal-scroll::-webkit-scrollbar-thumb { background: #fdba74; border-radius: 4px; }
     </style>
 </head>
 <body class="bg-orange-50 text-gray-800">
 
-    <nav class="bg-white shadow-md fixed w-full z-10 top-0">
+    <nav class="bg-white shadow-md fixed w-full z-10 top-0 transition-all duration-300">
         <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
-            <h1 class="text-2xl text-orange-600">Dulce Recepción 🍪</h1>
-            <button onclick="toggleCart()" class="relative text-orange-600 text-2xl">
+            <h1 class="text-2xl text-orange-600 hover:scale-105 transition cursor-pointer" onclick="window.scrollTo(0,0)">Dulce Recepción 🍪</h1>
+            <button onclick="toggleCart()" class="relative text-orange-600 text-2xl hover:text-orange-800 transition">
                 <i class="fas fa-shopping-cart"></i>
-                <span id="cart-count" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">0</span>
+                <span id="cart-count" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center transform scale-0 transition-transform duration-200">0</span>
             </button>
         </div>
     </nav>
 
-    <header class="mt-16 bg-orange-100 py-12 text-center px-4">
-        <h2 class="text-4xl md:text-5xl mb-4 text-orange-700">Navidad con sabor a Hogar</h2>
-        <p class="text-lg mb-6 max-w-2xl mx-auto">Galletas de jengibre, pan de pascua y repostería hecha con amor. Arma tu pedido aquí y envíalo directo a nuestro WhatsApp.</p>
-        <a href="#productos" class="bg-orange-500 text-white px-6 py-2 rounded-full font-bold shadow hover:bg-orange-600 transition">Ver Delicias</a>
+    <header class="mt-16 bg-orange-100 py-12 text-center px-4 border-b-4 border-orange-200">
+        <h2 class="text-4xl md:text-6xl mb-4 text-orange-700 drop-shadow-sm">Navidad con sabor a Hogar</h2>
+        <p class="text-lg mb-6 max-w-2xl mx-auto text-gray-700 font-medium">Galletas de jengibre, pan de pascua y repostería hecha con amor. Haz tu pedido y recíbelo con cariño.</p>
+        <a href="#productos" class="inline-block bg-orange-500 text-white px-8 py-3 rounded-full font-bold shadow-lg hover:bg-orange-600 hover:shadow-xl transition transform hover:-translate-y-1">Ver Delicias</a>
     </header>
 
     <section id="productos" class="max-w-6xl mx-auto p-4 py-10">
-        <h2 class="text-3xl text-center mb-8 text-orange-800">Nuestros Productos</h2>
-        
+        <h2 class="text-4xl text-center mb-10 text-orange-800">Nuestros Productos</h2>
         <div id="product-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             </div>
     </section>
 
-    <div id="cart-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex justify-end">
-        <div class="bg-white w-full md:w-96 h-full shadow-lg flex flex-col">
-            <div class="p-4 bg-orange-500 text-white flex justify-between items-center">
-                <h3 class="font-bold text-lg">Tu Pedido</h3>
-                <button onclick="toggleCart()" class="text-2xl">&times;</button>
-            </div>
-            
-            <div id="cart-items" class="flex-1 p-4 overflow-y-auto">
-                <p class="text-center text-gray-500 mt-10">Tu carrito está vacío.</p>
-            </div>
-
-            <div class="p-4 border-t bg-gray-50">
-                <div class="flex justify-between text-xl font-bold mb-4">
-                    <span>Total:</span>
-                    <span id="cart-total">$0</span>
+    <div id="product-modal" class="fixed inset-0 bg-black bg-opacity-60 hidden z-50 flex justify-center items-center p-4 backdrop-blur-sm transition-opacity duration-300">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col md:flex-row relative">
+        <button onclick="closeProductModal()" title="Cerrar" aria-label="Cerrar" class="absolute top-4 right-4 text-gray-500 hover:text-red-500 z-10 text-2xl bg-white rounded-full w-8 h-8 flex items-center justify-center shadow">
+            <i class="fas fa-times" aria-hidden="true"></i>
+            <span class="sr-only">Cerrar</span>
+        </button>
+        
+        <div class="w-full md:w-1/2 bg-gray-100 p-4 flex flex-col justify-center">
+            <img id="modal-main-img" src="" alt="Imagen del producto" title="Imagen del producto" class="w-full h-64 md:h-80 object-contain rounded-lg shadow-sm mb-4 bg-white">
+            <div id="modal-thumbnails" class="flex gap-2 overflow-x-auto py-2 px-1 justify-center">
                 </div>
-                <button onclick="checkoutWhatsApp()" class="w-full btn-wsp text-white py-3 rounded-lg font-bold shadow-md flex justify-center items-center gap-2 hover:scale-105 transition">
-                    <i class="fab fa-whatsapp text-xl"></i> Enviar Pedido por WhatsApp
+        </div>
+
+            <div class="w-full md:w-1/2 p-6 md:p-8 overflow-y-auto modal-scroll bg-white flex flex-col justify-between">
+                <div>
+                    <h3 id="modal-title" class="text-3xl text-orange-700 mb-2"></h3>
+                    <p id="modal-price" class="text-2xl font-bold text-green-600 mb-4"></p>
+                    <p id="modal-desc" class="text-gray-600 leading-relaxed mb-6"></p>
+                </div>
+                <button id="modal-add-btn" class="w-full bg-orange-500 text-white py-3 rounded-xl font-bold shadow-md hover:bg-orange-600 transition flex justify-center items-center gap-2 text-lg">
+                    <i class="fas fa-cart-plus"></i> Agregar al Pedido
                 </button>
             </div>
         </div>
     </div>
 
-    <footer class="bg-gray-800 text-white text-center py-6 mt-10">
-        <p>Dulce Recepción &copy; 2024</p>
-        <p class="text-sm text-gray-400">Hecho con ❤️ para Navidad</p>
+    <div id="cart-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex justify-end transition-opacity duration-300">
+        <div class="bg-white w-full md:w-96 h-full shadow-2xl flex flex-col transform transition-transform duration-300 translate-x-0">
+            <div class="p-4 bg-orange-600 text-white flex justify-between items-center shadow-md">
+                <h3 class="font-bold text-lg font-sans">Tu Pedido 🛒</h3>
+                <button onclick="toggleCart()" class="text-2xl hover:text-gray-200">&times;</button>
+            </div>
+            
+            <div id="cart-items" class="flex-1 p-4 overflow-y-auto bg-gray-50">
+                </div>
+
+            <div class="p-6 border-t bg-white shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
+                <div class="flex justify-between text-xl font-bold mb-4 text-gray-800">
+                    <span>Total:</span>
+                    <span id="cart-total">$0</span>
+                </div>
+                <button onclick="checkoutWhatsApp()" class="w-full btn-wsp text-white py-4 rounded-xl font-bold shadow-lg flex justify-center items-center gap-2 hover:scale-[1.02] transition text-lg">
+                    <i class="fab fa-whatsapp text-2xl"></i> Enviar a Dulce Recepción
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-gray-800 text-white text-center py-8 mt-10">
+        <p class="text-lg font-bold font-sans">Dulce Recepción 🍪</p>
+        <p class="text-sm text-gray-400 mt-2">Hecho con ❤️ en Chile</p>
+        <div class="mt-4 space-x-4">
+            <a href="#" class="text-gray-400 hover:text-white transition" title="Instagram — Dulce Recepción" aria-label="Instagram (abre en nueva ventana)">
+                <i class="fab fa-instagram text-2xl" aria-hidden="true"></i>
+                <span class="sr-only">Instagram</span>
+            </a>
+            <a href="#" class="text-gray-400 hover:text-white transition" title="Facebook — Dulce Recepción" aria-label="Facebook (abre en nueva ventana)">
+                <i class="fab fa-facebook text-2xl" aria-hidden="true"></i>
+                <span class="sr-only">Facebook</span>
+            </a>
+        </div>
     </footer>
 
     <script>
-        // DATOS DE PRODUCTOS
-        // NOTA: Reemplaza las URLs de las imágenes ('img') por las fotos reales cuando las subas.
+        // --- CONFIGURACIÓN DE PRODUCTOS ---
+        // Para agregar más fotos, solo agrégalas a la lista 'images' separadas por coma.
         const products = [
             {
                 id: 1,
                 name: "Bolsa 'Mini Encanto Navideño'",
-                desc: "4 galletas de jengibre decoradas a mano (botitas, bastones, coronas).",
+                desc: "Un paquetito alegre con 4 galletas de jengibre decoradas a mano. Cada una trae un guiño festivo: botitas rojas, bastones dulces, coronas brillantes y arbolitos que parecen contar historias. Un detalle perfecto para endulzar la tarde o regalar un abrazo comestible.",
                 price: 2000,
-                img: "https://images.unsplash.com/photo-1543255006-d6395b6f1171?auto=format&fit=crop&w=500&q=60" 
+                images: [
+                    "https://images.unsplash.com/photo-1543255006-d6395b6f1171?w=500", // Foto principal
+                    "https://images.unsplash.com/photo-1513201099705-a9746e1e201f?w=500"  // Foto detalle
+                ]
             },
             {
                 id: 2,
                 name: "Caja 'Ventana al Polo Norte'",
-                desc: "12 galletas decoradas en cajita con ventana + tarjeta.",
+                desc: "12 galletas decoradas que se asoman por una cajita con ventana, como pequeños duendes listos para saludar. Incluye decoración temática y una tarjeta para escribir esa frase que derrite el corazón más frío del invierno.",
                 price: 6000,
-                img: "https://images.unsplash.com/photo-1607268414001-47a197b69848?auto=format&fit=crop&w=500&q=60"
+                images: [
+                    "https://images.unsplash.com/photo-1607268414001-47a197b69848?w=500",
+                    "https://images.unsplash.com/photo-1599639668353-e9a870234c05?w=500",
+                    "https://images.unsplash.com/photo-1606836533807-d6c695e76421?w=500"
+                ]
             },
             {
                 id: 3,
                 name: "Caja Regalo 'Nochebuena Casera'",
-                desc: "Pan de pascua ½ kg + 8 galletas decoradas.",
+                desc: "Un tesoro gourmet: pan de pascua casero de ½ kg acompañado de 8 galletas decoradas con motivos navideños. Todo armado en una caja adornada con cariño y una tarjeta para darle voz a tu mensaje.",
                 price: 10000,
-                img: "https://images.unsplash.com/photo-1513201099705-a9746e1e201f?auto=format&fit=crop&w=500&q=60"
+                images: [
+                    "https://images.unsplash.com/photo-1513201099705-a9746e1e201f?w=500",
+                    "https://images.unsplash.com/photo-1605297702819-475338e1807e?w=500"
+                ]
             },
             {
                 id: 4,
                 name: "Casita de Jengibre 'Villa Azúcar'",
-                desc: "Kit para armar: base, 3 glaseados y toppings.",
+                desc: "Una casita de jengibre para armar y decorar, la aventura dulce que convierte cualquier mesa en taller mágico. Viene con base, 3 bolsitas de glaseado y un puñadito de toppings para coronar tu obra maestra.",
                 price: 8000,
-                img: "https://images.unsplash.com/photo-1576618148400-f54bed992c69?auto=format&fit=crop&w=500&q=60"
+                images: [
+                    "https://images.unsplash.com/photo-1576618148400-f54bed992c69?w=500",
+                    "https://images.unsplash.com/photo-1638546686576-48592425267f?w=500"
+                ]
             },
             {
                 id: 5,
                 name: "Pan de Pascua (½ kg)",
-                desc: "Receta casera con fruta confitada y frutos secos.",
+                desc: "Pan de pascua casero con la abundancia de fruta confitada y frutos secos, horneado como si fuera un recuerdo de infancia. Formato mediano.",
                 price: 4500,
-                img: "https://images.unsplash.com/photo-1606293820246-1f6b494983db?auto=format&fit=crop&w=500&q=60"
+                images: [
+                    "https://images.unsplash.com/photo-1606293820246-1f6b494983db?w=500"
+                ]
             },
             {
                 id: 6,
                 name: "Pan de Pascua (1 kg)",
-                desc: "El formato grande familiar. Receta casera.",
+                desc: "Pan de pascua casero con la abundancia de fruta confitada y frutos secos. Formato familiar para compartir en la mesa navideña.",
                 price: 8000,
-                img: "https://images.unsplash.com/photo-1606293820246-1f6b494983db?auto=format&fit=crop&w=500&q=60"
+                images: [
+                    "https://images.unsplash.com/photo-1606293820246-1f6b494983db?w=500"
+                ]
             }
         ];
 
         let cart = [];
 
-        // Renderizar productos
+        // --- RENDERIZADO DE PRODUCTOS ---
         const productList = document.getElementById('product-list');
         products.forEach(prod => {
             const card = document.createElement('div');
-            card.className = "bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition border border-orange-100";
+            card.className = "bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-2xl transition duration-300 border border-orange-50 group flex flex-col h-full";
+            
+            // Usamos la primera imagen para la tarjeta
+            const mainImage = prod.images[0];
+
             card.innerHTML = `
-                <img src="${prod.img}" alt="${prod.name}" class="w-full h-48 object-cover">
-                <div class="p-4">
-                    <h3 class="font-bold text-xl text-orange-900 mb-2">${prod.name}</h3>
-                    <p class="text-gray-600 text-sm mb-4 h-12 overflow-hidden">${prod.desc}</p>
-                    <div class="flex justify-between items-center mt-4">
-                        <span class="text-lg font-bold text-green-600">$${prod.price.toLocaleString('es-CL')}</span>
-                        <button onclick="addToCart(${prod.id})" class="bg-orange-500 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-orange-600 transition">
-                            Agregar
+                <div class="relative overflow-hidden h-64 cursor-pointer" onclick="openProductModal(${prod.id})">
+                    <img src="${mainImage}" alt="${prod.name}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
+                    <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition duration-300 flex items-center justify-center">
+                        <span class="bg-white text-orange-600 px-4 py-2 rounded-full opacity-0 group-hover:opacity-100 transition duration-300 font-bold shadow-lg transform translate-y-4 group-hover:translate-y-0">Ver Detalle</span>
+                    </div>
+                </div>
+                <div class="p-5 flex flex-col flex-grow">
+                    <h3 class="font-bold text-xl text-gray-800 mb-2 font-sans leading-tight cursor-pointer hover:text-orange-600 transition" onclick="openProductModal(${prod.id})">${prod.name}</h3>
+                    <p class="text-gray-500 text-sm mb-4 line-clamp-2 flex-grow">${prod.desc}</p>
+                    <div class="flex justify-between items-center mt-auto pt-4 border-t border-gray-100">
+                        <span class="text-xl font-bold text-orange-600">$${prod.price.toLocaleString('es-CL')}</span>
+                        <button onclick="addToCart(${prod.id})" class="bg-orange-100 text-orange-700 px-4 py-2 rounded-lg text-sm font-bold hover:bg-orange-500 hover:text-white transition">
+                            <i class="fas fa-plus"></i> Agregar
                         </button>
                     </div>
                 </div>
@@ -138,12 +203,17 @@
             productList.appendChild(card);
         });
 
-        // Funciones del Carrito
+        // --- LÓGICA DEL CARRITO ---
         function addToCart(id) {
             const product = products.find(p => p.id === id);
             cart.push(product);
             renderCart();
-            toggleCart(true); // Abrir carrito al agregar
+            animateCartIcon();
+            
+            // Feedback visual simple
+            // Si se agrega desde el modal, podríamos cerrar el modal o mostrar mensaje.
+            // Aquí solo cerramos el modal si estaba abierto para mostrar el carrito luego si se desea, 
+            // o simplemente dejamos que siga comprando.
         }
 
         function removeFromCart(index) {
@@ -157,9 +227,18 @@
             const cartTotal = document.getElementById('cart-total');
 
             cartCount.innerText = cart.length;
+            if(cart.length > 0) {
+                cartCount.classList.remove('scale-0');
+            } else {
+                cartCount.classList.add('scale-0');
+            }
 
             if (cart.length === 0) {
-                cartItemsContainer.innerHTML = '<p class="text-center text-gray-500 mt-10">Tu carrito está vacío 🍪</p>';
+                cartItemsContainer.innerHTML = `
+                    <div class="flex flex-col items-center justify-center h-full text-gray-400">
+                        <i class="fas fa-cookie-bite text-4xl mb-2"></i>
+                        <p>Tu carrito está vacío</p>
+                    </div>`;
                 cartTotal.innerText = '$0';
                 return;
             }
@@ -170,13 +249,16 @@
             cart.forEach((item, index) => {
                 total += item.price;
                 const itemEl = document.createElement('div');
-                itemEl.className = "flex justify-between items-center mb-4 border-b pb-2";
+                itemEl.className = "flex justify-between items-center mb-3 bg-white p-3 rounded-lg shadow-sm border border-gray-100";
                 itemEl.innerHTML = `
-                    <div>
-                        <h4 class="font-bold text-sm">${item.name}</h4>
-                        <span class="text-green-600 font-bold">$${item.price.toLocaleString('es-CL')}</span>
+                    <div class="flex items-center gap-3">
+                        <img src="${item.images[0]}" class="w-10 h-10 rounded object-cover">
+                        <div>
+                            <h4 class="font-bold text-xs md:text-sm text-gray-700 line-clamp-1">${item.name}</h4>
+                            <span class="text-orange-600 font-bold text-sm">$${item.price.toLocaleString('es-CL')}</span>
+                        </div>
                     </div>
-                    <button onclick="removeFromCart(${index})" class="text-red-500 hover:text-red-700"><i class="fas fa-trash"></i></button>
+                    <button onclick="removeFromCart(${index})" class="text-red-400 hover:text-red-600 w-8 h-8 flex items-center justify-center rounded-full hover:bg-red-50 transition"><i class="fas fa-trash"></i></button>
                 `;
                 cartItemsContainer.appendChild(itemEl);
             });
@@ -184,16 +266,68 @@
             cartTotal.innerText = '$' + total.toLocaleString('es-CL');
         }
 
-        function toggleCart(forceOpen = false) {
+        function toggleCart() {
             const modal = document.getElementById('cart-modal');
-            if (forceOpen) {
-                modal.classList.remove('hidden');
-            } else {
-                modal.classList.toggle('hidden');
-            }
+            modal.classList.toggle('hidden');
+        }
+        
+        function animateCartIcon() {
+            const badge = document.getElementById('cart-count');
+            badge.classList.add('scale-125');
+            setTimeout(() => badge.classList.remove('scale-125'), 200);
         }
 
-        // LÓGICA WHATSAPP
+        // --- LÓGICA DE DETALLE DE PRODUCTO (MODAL) ---
+        function openProductModal(id) {
+            const product = products.find(p => p.id === id);
+            if (!product) return;
+
+            // Llenar datos
+            document.getElementById('modal-title').innerText = product.name;
+            document.getElementById('modal-price').innerText = `$${product.price.toLocaleString('es-CL')}`;
+            document.getElementById('modal-desc').innerText = product.desc;
+            
+            // Configurar botón de agregar
+            const btn = document.getElementById('modal-add-btn');
+            btn.onclick = () => {
+                addToCart(product.id);
+                closeProductModal();
+                toggleCart(); // Abrir carrito automáticamente al agregar desde el modal
+            };
+
+            // Galería de imágenes
+            const mainImg = document.getElementById('modal-main-img');
+            const thumbnails = document.getElementById('modal-thumbnails');
+            
+            mainImg.src = product.images[0];
+            thumbnails.innerHTML = '';
+
+            if (product.images.length > 1) {
+                product.images.forEach((imgSrc) => {
+                    const thumb = document.createElement('img');
+                    thumb.src = imgSrc;
+                    thumb.className = "w-16 h-16 object-cover rounded border-2 border-transparent hover:border-orange-500 cursor-pointer transition";
+                    thumb.onclick = () => {
+                        mainImg.src = imgSrc;
+                    };
+                    thumbnails.appendChild(thumb);
+                });
+            }
+
+            // Mostrar modal
+            document.getElementById('product-modal').classList.remove('hidden');
+        }
+
+        function closeProductModal() {
+            document.getElementById('product-modal').classList.add('hidden');
+        }
+
+        // Cerrar modal si se hace clic fuera
+        document.getElementById('product-modal').addEventListener('click', function(e) {
+            if (e.target === this) closeProductModal();
+        });
+
+        // --- LÓGICA WHATSAPP ---
         function checkoutWhatsApp() {
             if (cart.length === 0) {
                 alert("Agrega productos al carrito primero 🍪");
@@ -204,7 +338,6 @@
             let message = "Hola Dulce Recepción! 🎄 Me gustaría hacer el siguiente pedido:%0A%0A";
             
             let total = 0;
-            // Agrupamos productos iguales para que se vea ordenado (Ej: 2x Galletas)
             const summary = {};
             cart.forEach(item => {
                 total += item.price;
@@ -217,11 +350,11 @@
             });
 
             for (const [name, details] of Object.entries(summary)) {
-                message += `- ${details.count}x ${name} ($${details.subtotal.toLocaleString('es-CL')})%0A`;
+                message += `▪️ ${details.count}x ${name} ($${details.subtotal.toLocaleString('es-CL')})%0A`;
             }
 
-            message += `%0A*Total a pagar: $${total.toLocaleString('es-CL')}*`;
-            message += "%0A%0AQuedo atento a los datos de transferencia.";
+            message += `%0A*💰 Total a pagar: $${total.toLocaleString('es-CL')}*`;
+            message += "%0A%0AQuedo atento a los datos de transferencia y coordinación de entrega.";
 
             const url = `https://wa.me/${phoneNumber}?text=${message}`;
             window.open(url, '_blank');
